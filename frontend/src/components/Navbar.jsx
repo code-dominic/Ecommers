@@ -1,10 +1,27 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
-const Navbar = () => {
+const Navbar = ({ token , setToken }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    navigate("/login");
+  };
+
+  useEffect(() => {
+    if (token) {
+      navigate('/');
+    }
+  }, [token, navigate]);
+
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid">
-        <Link className="navbar-brand" to="/">Ecommerce</Link>
+        <Link className="navbar-brand fw-bold text-teal" to="/" style={{ color: "#2d9382" }}>
+          PlasticPro
+        </Link>
 
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
           aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,7 +44,13 @@ const Navbar = () => {
             </li>
 
             <li className="nav-item">
-              <Link  className="nav-link " to="/login">Login</Link>
+              {token ? (
+                <button className="btn nav-link border-0 bg-transparent" onClick={handleLogout}>
+                  Logout
+                </button>
+              ) : (
+                <Link className="nav-link" to="/login">Login</Link>
+              )}
             </li>
 
           </ul>
