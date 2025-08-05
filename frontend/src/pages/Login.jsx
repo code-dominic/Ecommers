@@ -1,0 +1,63 @@
+import axios from "axios";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+function Login({ token, setToken }) {
+    const navigate = useNavigate();
+
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+
+    useEffect(() => {
+        if (token) {
+            navigate('/');
+        }
+    }, [token, navigate]);
+
+    const handleSubmit = async () => {
+        try {
+            const res = await axios.post('http://localhost:5000/login', { username, password });
+            console.log("Received token:", res.data.token);
+            setToken(res.data.token);
+        } catch (error) {
+            console.error("Login failed:", error.response?.data || error.message);
+        }
+    };
+
+    return (
+        <div className="container-fluid" style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
+            <div className="card" style={{ width: "36rem" }}>
+                <div className="card-header" style={{ textAlign: "center" }}>
+                    Login Page
+                </div>
+                <div className="card-body">
+                    <div className="form-floating mb-3">
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="floatingUsername"
+                            placeholder="User Name"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                        <label htmlFor="floatingUsername">User Name</label>
+                    </div>
+                    <div className="form-floating">
+                        <input
+                            type="password"
+                            className="form-control"
+                            id="floatingPassword"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <label htmlFor="floatingPassword">Password</label>
+                    </div>
+                    <button type="button" className="btn btn-outline-info" onClick={handleSubmit}>Submit</button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default Login;
