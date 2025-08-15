@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
-const Navbar = ({ token , setToken }) => {
+const Navbar = ({ token, setToken }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -10,58 +10,79 @@ const Navbar = ({ token , setToken }) => {
     navigate("/login");
   };
 
- useEffect(() => {
-  if (token && window.location.pathname === '/login') {
-    navigate('/');
-  }
-}, [token, navigate]);
+  useEffect(() => {
+    if (token && window.location.pathname === "/login") {
+      navigate("/");
+    }
+  }, [token, navigate]);
 
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary">
+    <nav
+      className="navbar navbar-expand-lg shadow-sm"
+      style={{
+        background: "linear-gradient(90deg, #2d9382, #1c5d53)",
+        padding: "0.8rem 1.5rem",
+      }}
+    >
       <div className="container-fluid">
-        <Link className="navbar-brand fw-bold text-teal" to="/" style={{ color: "#2d9382" }}>
+        <Link
+          className="navbar-brand fw-bold"
+          to="/"
+          style={{ color: "#fff", fontSize: "1.4rem" }}
+        >
           PlasticPro
         </Link>
 
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+          style={{ borderColor: "#fff" }}
+        >
           <span className="navbar-toggler-icon"></span>
         </button>
 
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-
+          <ul className="navbar-nav ms-auto mb-2 mb-lg-0 gap-2">
             <li className="nav-item">
-              <Link className="nav-link active" to="/">Home</Link>
-            </li>
-
-            <li className="nav-item">
-              <Link className="nav-link" to="/product">Product</Link>
-            </li>
-
-            <li className="nav-item">
-              <Link className="nav-link" to="/form">Add Products</Link>
+              <Link className="nav-link text-white fw-medium" to="/">
+                Home
+              </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/cart">Cart</Link>
+              <Link className="nav-link text-white fw-medium" to="/product">
+                Products
+              </Link>
             </li>
-
+            <li className="nav-item">
+              <Link className="nav-link text-white fw-medium" to="/form">
+                Add Products
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link text-white fw-medium" to="/cart">
+                Cart
+              </Link>
+            </li>
             <li className="nav-item">
               {token ? (
-                <button className="btn nav-link border-0 bg-transparent" onClick={handleLogout}>
+                <button
+                  className="btn btn-light btn-sm fw-semibold"
+                  onClick={handleLogout}
+                >
                   Logout
                 </button>
               ) : (
-                <Link className="nav-link" to="/login">Login</Link>
+                <Link className="btn btn-light btn-sm fw-semibold" to="/login">
+                  Login
+                </Link>
               )}
             </li>
-
           </ul>
-
-          <form className="d-flex" role="search">
-            <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-            <button className="btn btn-outline-success" type="submit">Search</button>
-          </form>
         </div>
       </div>
     </nav>

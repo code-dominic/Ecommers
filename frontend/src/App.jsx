@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import UseToken from "./app/UseToken";
 import Register from "./pages/Register";
 import Cart from "./pages/Cart";
+// import HeroSection from "./section/HeroSection";
 
 function App() {
   const { token , setToken} = UseToken();
@@ -23,6 +24,8 @@ function App() {
   return (
     <>
       <Navbar token={token} setToken={setToken}/>
+
+      
 
       <Routes>
         <Route path="/" element={<Home handelClick={handelClick} />} />

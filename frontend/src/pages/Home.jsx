@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 // import HorizontalCard from '../components/HorizontalCard'
 import HorizontalCard from "../components/HorizontalCard";
+import HeroSection from "../section/HeroSection";
 
 const Home = ({handelClick}) => {
   const [products, setProducts] = useState([]);
@@ -24,6 +25,8 @@ const Home = ({handelClick}) => {
 
   return (
     <>
+    <HeroSection/>
+
     <div
     style={{
   display: "flex",
