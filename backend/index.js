@@ -27,6 +27,19 @@ mongoose.connect("mongodb://localhost:27017/E-commers")
 
 
 
+const auth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: "No token provided" });
+
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, "1234", (err, decoded) => {
+    if (err) return res.status(403).json({ error: "Invalid token" });
+    req.userId = decoded.id;
+    next();
+  });
+};
+
+
 
 
 
@@ -48,6 +61,29 @@ app.post('/', async (req, res) => {
   res.json({ message: 'Product received!', data: req.body }); 
 });
 
+
+app.post('/products/cart/:id', auth, async (req, res) => {
+  const { id } = req.params; // product ID
+  const { Qty } = req.body;  // quantity
+
+  try {
+    const user = await User.findById(req.userId);
+
+    // Check if product is already in cart
+    const existingItem = user.cart.find(item => item.productOrdered.toString() === id);
+    if (existingItem) {
+      existingItem.Qty += Qty; // increase quantity
+    } else {
+      user.cart.push({ productOrdered: id, Qty });
+    }
+
+    await user.save();
+    res.status(200).json({ message: "Product added to cart", cart: user.cart });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+    
 app.get('/products/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -101,6 +137,35 @@ app.delete('/products/:id', async (req, res) => {
   }
 });
 
+app.put('/products/:id' , async (req , res)=>{
+    const {id} = req.params;
+
+    const { name , description , cost , imageUrl} = req.body;
+
+    try{
+
+      const updatedProduct = await Product.findByIdAndUpdate(
+        id,
+        { $set : {name , description , imageUrl , cost}},
+        { new: true, runValidators: true }
+      );
+
+      if(!updatedProduct){
+        return res.status(404).json({ message : "Product not Found"});
+      }
+
+      res.status(200).json({
+        message : "Product updated successfully",
+        product: updatedProduct
+      });
+    }catch(err){
+      res.status(500).json({
+        message : "Server Error",
+        error : err
+      })
+    }
+});
+
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
   console.log(username, email, password);
@@ -142,3 +207,38 @@ app.post('/login' , async(req,res)=>{
     res.json({token});  
     
 })
+
+
+
+app.get('/cart', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId)
+      .populate('cart.productOrdered'); // fetch product details
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.status(200).json(user.cart);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/cart/:id', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    user.cart = user.cart.filter(
+      item => item.productOrdered.toString() !== req.params.id
+    );
+
+    await user.save();
+    res.status(200).json({ message: 'Item removed', cart: user.cart });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+
+

@@ -8,11 +8,11 @@ function Login({ token, setToken }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    useEffect(() => {
-        if (token) {
-            navigate('/');
-        }
-    }, [token, navigate]);
+    // useEffect(() => {
+    //     if (token) {
+    //         navigate('/');
+    //     }
+    // }, [token, navigate]);
 
     const handleSubmit = async () => {
         try {

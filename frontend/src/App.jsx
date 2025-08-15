@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
 import UseToken from "./app/UseToken";
 import Register from "./pages/Register";
+import Cart from "./pages/Cart";
 
 function App() {
   const { token , setToken} = UseToken();
@@ -15,7 +16,8 @@ function App() {
 
   const handelClick = (proID) => {
     setProductID(proID);
-    navigate("/product");
+    localStorage.setItem("lastProductId", proID);
+    navigate("/products");
   };
 
   return (
@@ -24,15 +26,14 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Home handelClick={handelClick} />} />
-        <Route path="/product" element={<Product productId={productID}/>} />
+        <Route path="/products" element={<Product token={token} productId={productID} />} />
+        <Route path="/product" element={<Product token={token} productId={productID} />} />
         <Route path="/form" element={<FormElement />} />
         <Route path="/login" element={<Login token={token}  setToken={setToken}/>} />
         <Route path ="/register" element ={<Register token={token} setToken={setToken} />} />
-
+        <Route path ="/cart" element ={<Cart token={token}/>} />
       </Routes>
 
-
-      
     </>
   );
 }

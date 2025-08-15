@@ -36,7 +36,7 @@ const Home = ({handelClick}) => {
     <h1>Product List</h1>
     {Array.isArray(products) ? (
       products.map((product) => (
-        <HorizontalCard  product={product}  handelClick={handelClick}/> 
+        <HorizontalCard  product={product}  handelClick={handelClick} key={product._id}/> 
         
       ))
     ) : (

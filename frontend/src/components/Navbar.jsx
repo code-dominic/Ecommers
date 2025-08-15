@@ -10,11 +10,11 @@ const Navbar = ({ token , setToken }) => {
     navigate("/login");
   };
 
-  useEffect(() => {
-    if (token) {
-      navigate('/');
-    }
-  }, [token, navigate]);
+ useEffect(() => {
+  if (token && window.location.pathname === '/login') {
+    navigate('/');
+  }
+}, [token, navigate]);
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -41,6 +41,9 @@ const Navbar = ({ token , setToken }) => {
 
             <li className="nav-item">
               <Link className="nav-link" to="/form">Add Products</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/cart">Cart</Link>
             </li>
 
             <li className="nav-item">

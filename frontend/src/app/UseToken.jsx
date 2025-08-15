@@ -3,11 +3,11 @@ import { useState } from 'react';
 export default function UseToken() {
 
   const getToken = () => {
-    const tokenString = localStorage.getItem('token');
-    const userToken = tokenString;
-    console.log(tokenString)
-    return userToken
-  };
+  const tokenString = localStorage.getItem("token");
+  if (!tokenString || tokenString === "null") return null;
+  return tokenString;
+};
+
 
   const [token, setToken] = useState(getToken());
 
