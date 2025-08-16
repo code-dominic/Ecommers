@@ -2,6 +2,8 @@ import axios from "axios";
 import { useState , useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 
+const  BackendUrl = import.meta.env.VITE_APP_BackendUrl;
+
 function Register( {token , setToken}) {
 
     const navigate = useNavigate();
@@ -19,7 +21,7 @@ function Register( {token , setToken}) {
 
     const handleSubmit = async() =>{
         try{
-            const res = await axios.post('http://localhost:5000/register' , {username , email , password});
+            const res = await axios.post(`${BackendUrl}/register` , {username , email , password});
             console.log(res.data.token);
             setToken(res.data.token);
 

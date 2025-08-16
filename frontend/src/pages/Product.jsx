@@ -3,6 +3,9 @@ import axios from "axios";
 import { useNavigate , useParams} from "react-router-dom";
 import { Modal, Button, Form } from "react-bootstrap";
 
+
+const  BackendUrl = import.meta.env.VITE_APP_BackendUrl;
+
 const Product = ({ token , productId }) => {
   // const productId = useParams();
   const pid = productId || localStorage.getItem("lastProductId");
@@ -19,7 +22,7 @@ const Product = ({ token , productId }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/products/${productId}`);
+        const res = await axios.get(`${BackendUrl}/products/${productId}`);
         setProduct(res.data);
       } catch (error) {
         console.error("❌ Error fetching product:", error);
@@ -35,7 +38,7 @@ const Product = ({ token , productId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`http://localhost:5000/products/${productId}/review`, {
+      await axios.post(`${BackendUrl}/products/${productId}/review`, {
         text: reviewText,
         rating: rating
       });
@@ -43,7 +46,7 @@ const Product = ({ token , productId }) => {
       setReviewText("");
       setRating(5);
 
-      const updatedProduct = await axios.get(`http://localhost:5000/products/${productId}`);
+      const updatedProduct = await axios.get(`${BackendUrl}/products/${productId}`);
       setProduct(updatedProduct.data);
     } catch (e) {
       console.error("❌ Error submitting review:", e);
@@ -52,7 +55,7 @@ const Product = ({ token , productId }) => {
 
   const handelDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/products/${productId}`);
+      await axios.delete(`${BackendUrl}/products/${productId}`);
       console.log("Product deleted!!");
       navigate("/");
     } catch (error) {
@@ -71,13 +74,13 @@ const Product = ({ token , productId }) => {
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/products/${productId}`, {
+      await axios.put(`${BackendUrl}/products/${productId}`, {
         name: updatedName,
         description: updatedDescription,
         cost: updatedCost,
         imageUrl : updatedImageUrl
       });
-      const updatedProduct = await axios.get(`http://localhost:5000/products/${productId}`);
+      const updatedProduct = await axios.get(`${BackendUrl}/products/${productId}`);
       setProduct(updatedProduct.data);
       setShowUpdateModal(false);
     } catch (error) {
@@ -89,7 +92,7 @@ const Product = ({ token , productId }) => {
     e.preventDefault();
     try{
       await axios.post(
-      `http://localhost:5000/products/cart/${productId}`,
+      `${BackendUrl}/products/cart/${productId}`,
       { Qty: 1 },
       { headers: { Authorization: `Bearer ${token}` } }
     );

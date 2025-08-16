@@ -2,6 +2,10 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+
+const  BackendUrl = import.meta.env.VITE_APP_BackendUrl;
+
+
 function Login({ token, setToken }) {
     const navigate = useNavigate();
 
@@ -16,7 +20,7 @@ function Login({ token, setToken }) {
 
     const handleSubmit = async () => {
         try {
-            const res = await axios.post('http://localhost:5000/login', { username, password });
+            const res = await axios.post(`${BackendUrl}/login`, { username, password });
             console.log("Received token:", res.data.token);
             setToken(res.data.token);
         } catch (error) {

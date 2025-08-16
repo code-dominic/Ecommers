@@ -16,6 +16,7 @@ function App() {
   const navigate = useNavigate(); // ✅ useNavigate must be inside component
 
   const handelClick = (proID) => {
+    // alert('handelclick!!');
     setProductID(proID);
     localStorage.setItem("lastProductId", proID);
     navigate("/products");

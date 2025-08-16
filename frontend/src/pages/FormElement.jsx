@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
+const  BackendUrl = import.meta.env.BackendUrl;
+
 const FormElement = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -13,7 +15,7 @@ const FormElement = () => {
     console.log({ name, description, imageUrl, cost });
 
     try {
-      const response = await axios.post("http://localhost:5000/", {
+      const response = await axios.post(`${BackendUrl}`, {
         name,
         description,
         imageUrl,

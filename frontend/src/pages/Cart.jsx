@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Table } from "react-bootstrap";
 
+const  BackendUrl = import.meta.env.VITE_APP_BackendUrl;
+
 const CartPage = ({ token }) => {
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/cart", {
+        const res = await axios.get(`${BackendUrl}/cart`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setCart(res.data);
@@ -21,7 +23,7 @@ const CartPage = ({ token }) => {
 
   const removeItem = async (productId) => {
     try {
-      await axios.delete(`http://localhost:5000/cart/${productId}`, {
+      await axios.delete(`${BackendUrl}cart/${productId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCart(cart.filter(item => item.productOrdered._id !== productId));
