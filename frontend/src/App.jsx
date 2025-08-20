@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import Home from './pages/Home';
-import Product from "./pages/product";
+import Product from "./pages/Product";
 import FormElement from "./pages/FormElement";
 import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
