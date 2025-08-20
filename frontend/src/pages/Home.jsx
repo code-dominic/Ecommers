@@ -13,7 +13,7 @@ const Home = ({ handelClick }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${BackendUrl}`);
+        const res = await axios.get(`${BackendUrl}/products`);
         console.log("👉 Server response:", res.data); 
         setProducts(res.data);
       } catch (error) {

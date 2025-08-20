@@ -1,83 +1,177 @@
-import { useState } from "react";
 import axios from "axios";
-
-const  BackendUrl = import.meta.env.BackendUrl;
+import { useState } from "react";
+const  BackendUrl = import.meta.env.VITE_APP_BackendUrl;
 
 const FormElement = () => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [cost, setCost] = useState(0);
+  const [product, setProduct] = useState({
+    name: "",
+    description: "",
+    color: "",
+    size: "",
+    cost: 0,
+    imageUrl: "",
+    variants: [],
+  });
 
+  const [variant, setVariant] = useState({
+    size: "",
+    color: "",
+    cost: "",
+    imageUrl: "",
+  });
+
+  // handle product field changes
+  const handleProductChange = (e) => {
+    setProduct({ ...product, [e.target.name]: e.target.value });
+  };
+
+  // handle variant field changes
+  const handleVariantChange = (e) => {
+    setVariant({ ...variant, [e.target.name]: e.target.value });
+  };
+
+  // add variant into product.variants[]
+  const addVariant = () => {
+    setProduct({
+      ...product,
+      variants: [...product.variants, variant],
+    });
+    // reset variant form
+    setVariant({ size: "", color: "", cost: "", imageUrl: "" });
+  };
+
+  // submit full product
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("PRODUCT SUBMIT!!");
-    console.log({ name, description, imageUrl, cost });
+    console.log("Submitting Product:", product);
 
     try {
-      const response = await axios.post(`${BackendUrl}`, {
-        name,
-        description,
-        imageUrl,
-        cost,
+      const response = await axios.post(`${backendURL}/products`, {
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product),
       });
-
-      console.log("Server response:", response.data);
-
-      // Reset form
-      setName("");
-      setDescription("");
-      setImageUrl("");
-      setCost(0);
-    } catch (error) {
-      console.error("Error submitting product:", error);
+      const data = await response.json();
+      console.log("Saved:", data);
+    } catch (err) {
+      console.error("Error:", err);
     }
   };
 
   return (
-    <>
-      <h1>Add Products</h1>
+    <form onSubmit={handleSubmit} className="p-4 space-y-4 border rounded-md">
+      <h2 className="text-xl font-bold">Add Products</h2>
 
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="name">Product Name:</label>
+      {/* Product Fields */}
+      <input
+        type="text"
+        name="name"
+        placeholder="Product Name"
+        value={product.name}
+        onChange={handleProductChange}
+        className="border p-2 w-full"
+      />
+      <input
+        type="text"
+        name="description"
+        placeholder="Description"
+        value={product.description}
+        onChange={handleProductChange}
+        className="border p-2 w-full"
+      />
+      <input
+        type="text"
+        name="color"
+        placeholder="Default Color"
+        value={product.color}
+        onChange={handleProductChange}
+        className="border p-2 w-full"
+      />
+      <input
+        type="text"
+        name="size"
+        placeholder="Default Size"
+        value={product.size}
+        onChange={handleProductChange}
+        className="border p-2 w-full"
+      />
+      <input
+        type="number"
+        name="cost"
+        placeholder="Base Cost"
+        value={product.cost}
+        onChange={handleProductChange}
+        className="border p-2 w-full"
+      />
+      <input
+        type="text"
+        name="imageUrl"
+        placeholder="Product Image URL"
+        value={product.imageUrl}
+        onChange={handleProductChange}
+        className="border p-2 w-full"
+      />
+
+      {/* Variants Section */}
+      <h3 className="text-lg font-semibold">Variants</h3>
+      <div className="flex flex-wrap gap-2">
         <input
           type="text"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          name="color"
+          placeholder="Color"
+          value={variant.color}
+          onChange={handleVariantChange}
+          className="border p-2"
         />
-        <br /><br />
-
-        <label htmlFor="description">Description:</label>
         <input
           type="text"
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          name="size"
+          placeholder="Size"
+          value={variant.size}
+          onChange={handleVariantChange}
+          className="border p-2"
         />
-        <br /><br />
-
-        <label htmlFor="cost">Cost:</label>
         <input
           type="number"
-          id="cost"
-          value={cost}
-          onChange={(e) => setCost(Number(e.target.value))}
+          name="cost"
+          placeholder="Cost"
+          value={variant.cost}
+          onChange={handleVariantChange}
+          className="border p-2"
         />
-        <br /><br />
-
-        <label htmlFor="imageUrl">Image URL:</label>
         <input
           type="text"
-          id="imageUrl"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
+          name="imageUrl"
+          placeholder="Variant Image URL"
+          value={variant.imageUrl}
+          onChange={handleVariantChange}
+          className="border p-2"
         />
-        <br /><br />
+        <button
+          type="button"
+          onClick={addVariant}
+          className="bg-blue-500 text-white px-3 py-1 rounded"
+        >
+          Add Variant
+        </button>
+      </div>
 
-        <button type="submit">Submit</button>
-      </form>
-    </>
+      {/* Show added variants */}
+      <ul className="list-disc pl-5">
+        {product.variants.map((v, i) => (
+          <li key={i}>
+            {v.color} - {v.size} (Cost: {v.cost}, Image: {v.imageUrl})
+          </li>
+        ))}
+      </ul>
+
+      {/* Submit Button */}
+      <button
+        type="submit"
+        className="bg-green-600 text-white px-4 py-2 rounded"
+      >
+        Save Product
+      </button>
+    </form>
   );
 };
 

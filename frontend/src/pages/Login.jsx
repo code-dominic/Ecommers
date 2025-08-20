@@ -20,7 +20,7 @@ function Login({ token, setToken }) {
 
     const handleSubmit = async () => {
         try {
-            const res = await axios.post(`${BackendUrl}/login`, { username, password });
+            const res = await axios.post(`${BackendUrl}/users/login`, { username, password });
             console.log("Received token:", res.data.token);
             setToken(res.data.token);
         } catch (error) {

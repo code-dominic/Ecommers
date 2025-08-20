@@ -21,7 +21,7 @@ function Register( {token , setToken}) {
 
     const handleSubmit = async() =>{
         try{
-            const res = await axios.post(`${BackendUrl}/register` , {username , email , password});
+            const res = await axios.post(`${BackendUrl}/users/register` , {username , email , password});
             console.log(res.data.token);
             setToken(res.data.token);
 

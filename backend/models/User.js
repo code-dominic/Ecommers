@@ -27,3 +27,12 @@ const userSchema = new Schema({
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;
+
+
+// Varaint : [
+//     {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: "Varaint",
+//       required: true
+//     }
+//   ],
