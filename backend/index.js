@@ -18,6 +18,10 @@ app.use("/products", productRoutes);
 app.use("/users", userRoutes);
 app.use("/cart", cartRoutes);
 
+app.get("/" , (req , res) =>{
+    res.send("HI the backend is working!!!");
+})
+
 // MongoDB + Server
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
