@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import Home from './pages/Home';
-import Product from "./pages/Product";
+import Product from "./pages/Products/Product";
 import FormElement from "./pages/FormElement";
 import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
@@ -30,7 +30,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Home handelClick={handelClick} />} />
-        <Route path="/products" element={<Product token={token} productId={productID} />} />
+        <Route path="/products" element={<Product token={token} productID={productID} setProductID={setProductID}/>} />
         <Route path="/product" element={<Product token={token} productId={productID} />} />
         <Route path="/form" element={<FormElement />} />
         <Route path="/login" element={<Login token={token}  setToken={setToken}/>} />

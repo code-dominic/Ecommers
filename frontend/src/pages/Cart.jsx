@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Table } from "react-bootstrap";
 
-const  BackendUrl = import.meta.env.VITE_APP_BackendUrl;
+const BackendUrl = import.meta.env.VITE_APP_BackendUrl;
 
 const CartPage = ({ token }) => {
   const [cart, setCart] = useState([]);
@@ -21,12 +21,12 @@ const CartPage = ({ token }) => {
     fetchCart();
   }, [token]);
 
-  const removeItem = async (productId) => {
+  const removeItem = async (cartItemId) => {
     try {
-      await axios.delete(`${BackendUrl}cart/${productId}`, {
+      await axios.delete(`${BackendUrl}/cart/${cartItemId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setCart(cart.filter(item => item.productOrdered._id !== productId));
+      setCart(cart.filter(item => item._id !== cartItemId));
     } catch (error) {
       console.error("Error removing item:", error);
     }
@@ -42,6 +42,8 @@ const CartPage = ({ token }) => {
           <thead>
             <tr>
               <th>Product</th>
+              <th>Color</th>
+              <th>Size</th>
               <th>Qty</th>
               <th>Price</th>
               <th>Total</th>
@@ -49,22 +51,40 @@ const CartPage = ({ token }) => {
             </tr>
           </thead>
           <tbody>
-            {cart.map((item) => (
-              <tr key={item.productOrdered._id}>
-                <td>{item.productOrdered.name}</td>
-                <td>{item.Qty}</td>
-                <td>₹{item.productOrdered.cost}</td>
-                <td>₹{item.productOrdered.cost * item.Qty}</td>
-                <td>
-                  <Button
-                    variant="danger"
-                    onClick={() => removeItem(item.productOrdered._id)}
-                  >
-                    Remove
-                  </Button>
-                </td>
-              </tr>
-            ))}
+            {cart.map((item) => {
+              // If variant exists, prefer its cost; else fallback to product cost
+              const price = item.productVariant ? item.productVariant.cost : item.product.cost;
+              const name = item.productVariant
+                ? `${item.product.name} (${item.productVariant.color}, ${item.productVariant.size})`
+                : item.product.name;
+
+              return (
+                <tr key={item._id}>
+                  <td>{name}</td>
+                  <td>
+                    {item.productVariant
+                      ? `${item.productVariant.color}`
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {item.productVariant
+                      ? `${item.productVariant.size}`
+                      : "N/A"}
+                  </td>
+                  <td>{item.Qty}</td>
+                  <td>₹{price}</td>
+                  <td>₹{price * item.Qty}</td>
+                  <td>
+                    <Button
+                      variant="danger"
+                      onClick={() => removeItem(item._id)}
+                    >
+                      Remove
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       )}

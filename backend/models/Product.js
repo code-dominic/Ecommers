@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Varaint = require('./Varaint');
+const Varaint = require('./Variant');
 
 const productSchema = new mongoose.Schema({
   name: String,
@@ -11,7 +11,7 @@ const productSchema = new mongoose.Schema({
   variant : [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Varaint"
+      ref: "Variant"
     }
   ],
   reviews: [

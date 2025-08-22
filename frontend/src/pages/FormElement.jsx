@@ -46,10 +46,7 @@ const FormElement = () => {
     console.log("Submitting Product:", product);
 
     try {
-      const response = await axios.post(`${backendURL}/products`, {
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(product),
-      });
+      const response = await axios.post(`${BackendUrl}/products`, product);
       const data = await response.json();
       console.log("Saved:", data);
     } catch (err) {

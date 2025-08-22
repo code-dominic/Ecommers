@@ -19,8 +19,9 @@ const userSchema = new Schema({
    },
    cart: [
       {
-         productOrdered: { type: Schema.Types.ObjectId, ref: 'Product' },
-         Qty: { type: Number, required: true }
+         product : { type : Schema.Types.ObjectId , ref : 'Product'},
+         Qty: { type: Number, required: true },
+         productVariant : { type: Schema.Types.ObjectId, ref: 'Varaint'}
       }
    ]
 });
@@ -29,10 +30,3 @@ const User = mongoose.model('User', userSchema);
 module.exports = User;
 
 
-// Varaint : [
-//     {
-//       type: mongoose.Schema.Types.ObjectId,
-//       ref: "Varaint",
-//       required: true
-//     }
-//   ],
