@@ -4,7 +4,7 @@ import ToggleButton from "react-bootstrap/ToggleButton";
 import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
 import { Modal, Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import VariantToggle from "./Components/VariantToggle";
+import VariantToggle from "./components/VariantToggle";
 
 const BackendUrl = import.meta.env.VITE_APP_BackendUrl;
 
