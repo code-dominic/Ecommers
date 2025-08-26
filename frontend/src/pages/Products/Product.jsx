@@ -203,7 +203,11 @@ const Product = ({ token, productID, setProductID }) => {
       <div style={{ display: "flex", justifyContent: "center", gap: "2rem", padding: "2rem" }}>
         {/* Product Card */}
         <div className="card" style={{ width: "36rem" }}>
-          <img
+          <img 
+            style={{
+              height : '500px',
+
+            }}
             src={currProduct.imageUrl || product.imageUrl}
             className="card-img-top"
             alt={product.name}

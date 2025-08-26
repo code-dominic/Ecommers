@@ -8,6 +8,11 @@ import Login from "./pages/Login";
 import UseToken from "./app/UseToken";
 import Register from "./pages/Register";
 import Cart from "./pages/Cart";
+import AdminLogin from "./AdminPages/AdminLogin";
+import Dashboard from "./AdminPages/Dashboard";
+import UserPage from "./AdminPages/UserPage";
+import AdminPage from "./AdminPages/AdminPage";
+import AdminOrdersPage from "./AdminPages/AdminOrdersPage";
 // import HeroSection from "./section/HeroSection";
 
 function App() {
@@ -33,9 +38,14 @@ function App() {
         <Route path="/products" element={<Product token={token} productID={productID} setProductID={setProductID}/>} />
         <Route path="/product" element={<Product token={token} productId={productID} />} />
         <Route path="/form" element={<FormElement />} />
-        <Route path="/login" element={<Login token={token}  setToken={setToken}/>} />
+        <Route path="/login" element={<Login token={token}  setToken={setToken}/>}  />
         <Route path ="/register" element ={<Register token={token} setToken={setToken} />} />
         <Route path ="/cart" element ={<Cart token={token}/>} />
+        <Route path="/adminlogin"  element={<AdminLogin token={token}  setToken={setToken}/>} />
+        <Route path="/dashboard" element = {<Dashboard/>} />
+        <Route path="/dashboard/users" element = {<UserPage/>} />
+        <Route path="/dashboard/admins" element={<AdminPage/>}/>
+        <Route path="/dashboard/orders" element={<AdminOrdersPage/>}/>
       </Routes>
 
     </>

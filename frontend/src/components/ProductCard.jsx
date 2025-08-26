@@ -73,7 +73,7 @@ const ProductCard = ({ product ,handelClick }) => {
         </Card.Title>
 
         <div>
-          <span className="fw-bold text-success">${product.cost}</span>{" "}
+          <span className="fw-bold text-success">₹{product.cost}</span>{" "}
           <del className="text-muted"></del>
         </div>
       </Card.Body>

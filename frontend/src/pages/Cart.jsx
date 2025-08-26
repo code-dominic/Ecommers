@@ -32,6 +32,39 @@ const CartPage = ({ token }) => {
     }
   };
 
+
+  const placeOrder = async () => {
+    try {
+
+      if (cart.length === 0) {
+        alert('Your Cart is Empty!!');
+        return;
+      }
+
+      const orders = cart.map(item => {
+        const price = item.productVariant ? item.productVariant.cost : item.product.cost;
+        return {
+          product : item.product,
+          productVariant : (item.productVariant? item.productVariant : null),
+          quantity : item.Qty,
+          totalPrice: price * item.Qty
+        };
+      });
+
+      const res = await axios.post(`${BackendUrl}/orders`, 
+      { orders },  // payload
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    console.log("Order placed:", res.data);
+    alert("Order placed successfully!");
+
+
+    } catch (error) {
+      console.error("Error in Placing order : ", error);
+    }
+  }
+
   return (
     <div className="container mt-4">
       <h2>Your Cart</h2>
@@ -87,7 +120,13 @@ const CartPage = ({ token }) => {
             })}
           </tbody>
         </Table>
+
       )}
+
+      <Button
+        variant="outline-success"
+        onClick={() => placeOrder()}
+      >Order</Button>
     </div>
   );
 };

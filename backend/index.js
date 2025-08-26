@@ -6,6 +6,9 @@ require("dotenv").config();   // <--- add this
 const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
 const cartRoutes = require("./routes/cartRoutes");
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+
 
 const app = express();
 
@@ -15,8 +18,10 @@ app.use(express.json());
 
 // Routes
 app.use("/products", productRoutes);
+app.use("/orders" , orderRoutes);
 app.use("/users", userRoutes);
 app.use("/cart", cartRoutes);
+app.use("/dashboard" , dashboardRoutes);
 
 app.get("/" , (req , res) =>{
     res.send("HI the backend is working!!!");
