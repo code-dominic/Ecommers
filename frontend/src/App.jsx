@@ -13,6 +13,7 @@ import Dashboard from "./AdminPages/Dashboard";
 import UserPage from "./AdminPages/UserPage";
 import AdminPage from "./AdminPages/AdminPage";
 import AdminOrdersPage from "./AdminPages/AdminOrdersPage";
+import Orders from './pages/Orders'
 // import HeroSection from "./section/HeroSection";
 
 function App() {
@@ -45,7 +46,8 @@ function App() {
         <Route path="/dashboard" element = {<Dashboard/>} />
         <Route path="/dashboard/users" element = {<UserPage/>} />
         <Route path="/dashboard/admins" element={<AdminPage/>}/>
-        <Route path="/dashboard/orders" element={<AdminOrdersPage/>}/>
+        <Route path="/dashboard/orders" element={<AdminOrdersPage token={token}/>}/>
+        <Route path="/orders" element={<Orders token={token}/>}/>
       </Routes>
 
     </>

@@ -4,14 +4,16 @@ import axios from "axios";
 
 const BackendUrl = import.meta.env.VITE_APP_BackendUrl;
 
-function AdminOrdersPage() {
+function AdminOrdersPage({token}) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get(`${BackendUrl}/orders`); // adjust route if needed
+        const res = await axios.get(`${BackendUrl}/admin/orders`,
+          {headers: { Authorization: `Bearer ${token}`}}
+        ); // adjust route if needed
         setOrders(res.data.orders);
       } catch (error) {
         console.error("Error fetching orders:", error);
