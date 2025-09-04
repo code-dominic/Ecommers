@@ -13,6 +13,7 @@ const CartPage = ({ token }) => {
         const res = await axios.get(`${BackendUrl}/cart`, {
           headers: { Authorization: `Bearer ${token}` }
         });
+        console.log(res.data);
         setCart(res.data);
       } catch (error) {
         console.error("Error fetching cart:", error);

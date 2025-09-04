@@ -83,4 +83,34 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
+router.patch("/:orderId/cancel", auth, async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const userID = req.userId; // from your auth middleware
+    console.log("userid :" , userID);
+
+    // Find the order
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Ensure it belongs to the logged-in user
+    if (!order.user.equals(userID)) {
+      return res.status(401).json({ message: "You are not authorized to cancel this order" });
+    }
+
+    // Update only the status
+    order.status = "cancelled";
+    await order.save();
+
+    res.status(200).json({ message: "Order cancelled successfully", order });
+  } catch (error) {
+    console.error("Error cancelling order:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 module.exports = router;

@@ -54,13 +54,13 @@ const Navbar = ({ token, setToken }) => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link text-white fw-medium" to="/product">
-                Products
+              <Link className="nav-link text-white fw-medium" to="/dashboard">
+                DashBoard
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link text-white fw-medium" to="/form">
-                Add Products
+              <Link className="nav-link text-white fw-medium" to="/orders">
+                My Orders
               </Link>
             </li>
             <li className="nav-item">

@@ -105,7 +105,7 @@ exports.deleteProduct = async (req, res) => {
     if (!product) return res.status(404).json({ message: "Product not found" });
 
     await Review.deleteMany({ _id: { $in: product.reviews } });
-    await User.updateMany({}, { $pull: { cart: { productOrdered: req.params.id } } });
+    await User.updateMany({}, { $pull: { cart: { product : req.params.id } } });
     await Variant.deleteMany({ _id : { $in : product.variant}});
     await Product.findByIdAndDelete(req.params.id);
 

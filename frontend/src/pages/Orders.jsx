@@ -23,16 +23,22 @@ function Orders({ token }) {
   }, [token]);
 
   // ✅ Remove item from order
-  const removeItem = async (orderId) => {
-    try {
-      await axios.delete(`${BackendUrl}/orders/${orderId}`, {
+  const cancelOrder = async (orderId) => {
+  try {
+    // alert("Canceling order!!");
+
+    await axios.patch(
+      `${BackendUrl}/orders/${orderId}/cancel`,
+      {}, // or { status: "canceled" } depending on your API
+      {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      setOrders((prev) => prev.filter((o) => o._id !== orderId));
-    } catch (error) {
-      console.error("Error removing order item", error);
-    }
-  };
+      }
+    );
+
+  } catch (error) {
+    console.error("Error canceling order", error);
+  }
+};
 
 
   return (
@@ -50,6 +56,7 @@ function Orders({ token }) {
               <th>Qty</th>
               <th>Price</th>
               <th>Total</th>
+              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -69,9 +76,10 @@ function Orders({ token }) {
                   <td>{order.quantity}</td>
                   <td>₹{price}</td>
                   <td>₹{price * order.quantity}</td>
+                  <td>{order.status}</td>
                   <td>
-                    <Button variant="danger" onClick={() => removeItem(item._id)}>
-                      cancel
+                    <Button variant="danger" onClick={() => cancelOrder(order._id)}>
+                      Cancel Order
                     </Button>
                   </td>
                 </tr>

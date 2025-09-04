@@ -30,6 +30,26 @@ router.get("/"  , async (req, res) => {
   }
 });
 
+router.get("/cancel", auth , async(req, res)=>{
+  try{
+    const orders = await Order.find({status : 'cancelled'})
+      .populate("user", "username email")       // only show username + email
+      .populate("product")        // only show product name + price
+      .populate("variant")   // only show variant details
+      .sort({ createdAt: -1 });// newest first
+
+      console.log("canceled order : ");
+      console.log(orders);
+
+    res.status(200).json({orders});
+
+
+  }catch(error){
+    console.error("Error fetching orders:", error);
+    res.status(500).json({message: "Server error"});
+  }
+})
+
 
 
 module.exports = router;
