@@ -12,7 +12,7 @@ exports.register = async (req, res) => {
     const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
 
-    const token = jwt.sign({ id: newUser._id }, "1234", { expiresIn: "1h" });
+    const token = jwt.sign({id: newUser._id }, "1234", { expiresIn: "6h" });
     res.status(201).json({ token, message: "User registered successfully" });
   } catch (error) {
     res.status(400).json({ error: "User Already Exists!!" });
@@ -27,6 +27,6 @@ exports.login = async (req, res) => {
   const isValidPassword = await bcrypt.compare(password, user.password);
   if (!isValidPassword) return res.status(400).json({ error: "Invalid credentials" });
 
-  const token = jwt.sign({ id: user._id }, "1234", { expiresIn: "1h" });
+  const token = jwt.sign({ id: user._id }, "1234", { expiresIn: "6h" });
   res.json({ token });
 };

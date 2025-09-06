@@ -18,6 +18,10 @@ import AdminProductsList from "./AdminPages/AdminProductsList";
 import AdminProductPages from "./AdminPages/AdminProductPages";
 import AdminLayout from "./layouts/AdminLayout"; // ✅ new layout
 import AdminCancellation from "./AdminPages/AdminCancellation";
+import ReturnPage from "./AdminPages/ReturnPage";
+import PickupPage from "./AdminPages/PickupPage";
+import Sales from "./AdminPages/Sales";
+
 
 function App() {
   const { token , setToken } = UseToken();
@@ -59,6 +63,11 @@ function App() {
           <Route path="products-list" element={<AdminProductsList token={token} setProductID={setProductID}/>} />
           <Route path="products-list/views" element={<AdminProductPages token={token} productID={productID}/>} />
           <Route path="addproducts" element={<FormElement token={token}  />} />
+          <Route path="products/add" element={<FormElement token={token}  />} />
+          <Route path="products/add" element={<FormElement token={token}  />} />
+          <Route path="returns" element={<ReturnPage/>}/>
+          <Route path="pickups" element={<PickupPage/>}/>
+          <Route path="sales" element={<Sales/>}/>
         </Route>
       </Routes>
     </>

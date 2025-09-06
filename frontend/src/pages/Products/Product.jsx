@@ -239,7 +239,7 @@ const Product = ({ token, productID, setProductID }) => {
               <Button variant="outline-warning" className="me-2" onClick={handleAddToCart}>
                 Add to Cart
               </Button>
-              <Button variant="outline-danger" className="me-2" onClick={handleDelete}>
+              {/* <Button variant="outline-danger" className="me-2" onClick={handleDelete}>
                 Delete
               </Button>
               <Button variant="outline-primary" onClick={() => {
@@ -251,7 +251,7 @@ const Product = ({ token, productID, setProductID }) => {
                 setShowUpdateModal(true);
               }}>
                 Update
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
@@ -298,7 +298,7 @@ const Product = ({ token, productID, setProductID }) => {
         </div>
       </div>
 
-      {/* Update Modal */}
+      {/* Update Modal
       <Modal show={showUpdateModal} onHide={() => setShowUpdateModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Update Product</Modal.Title>
@@ -327,7 +327,7 @@ const Product = ({ token, productID, setProductID }) => {
             <Button variant="primary" type="submit">Save Changes</Button>
           </Modal.Footer>
         </Form>
-      </Modal>
+      </Modal> */}
     </>
   );
 };

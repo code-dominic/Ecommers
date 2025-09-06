@@ -194,7 +194,7 @@ const FormElement = () => {
                     </div>
                   </div>
 
-                  <div className="mb-3">
+                  {/* <div className="mb-3">
                     <label htmlFor="productImage" className="form-label fw-bold">
                       Product Image URL
                     </label>
@@ -207,7 +207,7 @@ const FormElement = () => {
                       onChange={handleProductChange}
                       className="form-control"
                     />
-                  </div>
+                  </div> */}
                   <div className="mb-3">
                     <label htmlFor="productImage" className="form-label fw-bold">
                       Product Image 

@@ -2,9 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-
-const  BackendUrl = import.meta.env.VITE_APP_BackendUrl;
-
+const BackendUrl = import.meta.env.VITE_APP_BackendUrl;
 
 function Login({ token, setToken }) {
     const navigate = useNavigate();
@@ -12,11 +10,11 @@ function Login({ token, setToken }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    // useEffect(() => {
-    //     if (token) {
-    //         navigate('/');
-    //     }
-    // }, [token, navigate]);
+    useEffect(() => {
+        if (token) {
+            navigate('/');
+        }
+    }, [token, navigate]);
 
     const handleSubmit = async () => {
         try {
@@ -24,17 +22,19 @@ function Login({ token, setToken }) {
             console.log("Received token:", res.data.token);
             setToken(res.data.token);
         } catch (error) {
-            console.error("Login failed:", error.response?.data || error.message);
+            const message = error.response?.data?.message || "Login failed!";
+            alert(message);
+            console.error("Login failed:", message);
         }
     };
 
     return (
-        <div className="container-fluid" style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
-            <div className="card" style={{ width: "36rem" }}>
-                <div className="card-header" style={{ textAlign: "center" }}>
-                    Login Page
+        <div className="container-fluid d-flex justify-content-center align-items-center vh-100 bg-light">
+            <div className="card shadow-lg border-0" style={{ width: "28rem", borderRadius: "15px" }}>
+                <div className="card-header text-center bg-info text-white" style={{ borderTopLeftRadius: "15px", borderTopRightRadius: "15px" }}>
+                    <h4 className="mb-0">Welcome Back</h4>
                 </div>
-                <div className="card-body">
+                <div className="card-body p-4">
                     <div className="form-floating mb-3">
                         <input
                             type="text"
@@ -46,7 +46,7 @@ function Login({ token, setToken }) {
                         />
                         <label htmlFor="floatingUsername">User Name</label>
                     </div>
-                    <div className="form-floating">
+                    <div className="form-floating mb-4">
                         <input
                             type="password"
                             className="form-control"
@@ -57,7 +57,27 @@ function Login({ token, setToken }) {
                         />
                         <label htmlFor="floatingPassword">Password</label>
                     </div>
-                    <button type="button" className="btn btn-outline-info" onClick={handleSubmit}>Submit</button>
+
+                    <button
+                        type="button"
+                        className="btn btn-info w-100 text-white fw-bold"
+                        onClick={handleSubmit}
+                    >
+                        Login
+                    </button>
+
+                    <div className="text-center mt-3">
+                        <small>
+                            Don't have an account?{" "}
+                            <button
+                                type="button"
+                                className="btn btn-link p-0 text-info fw-semibold"
+                                onClick={() => navigate("/register")}
+                            >
+                                Register here
+                            </button>
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>
