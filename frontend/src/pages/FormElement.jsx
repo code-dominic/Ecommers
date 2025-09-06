@@ -10,6 +10,7 @@ const FormElement = () => {
     size: "",
     cost: 0,
     imageUrl: "",
+    imageFile : "",
     variants: [],
   });
 
@@ -21,9 +22,15 @@ const FormElement = () => {
   });
 
   // handle product field changes
-  const handleProductChange = (e) => {
-    setProduct({ ...product, [e.target.name]: e.target.value });
-  };
+ const handleProductChange = (e) => {
+  const { name, value, files } = e.target;
+
+  if (name === "imageFile") {
+    setProduct({ ...product, imageFile: files[0] }); // store file object
+  } else {
+    setProduct({ ...product, [name]: value });
+  }
+};
 
   // handle variant field changes
   const handleVariantChange = (e) => {
@@ -50,17 +57,36 @@ const FormElement = () => {
 
   // submit full product
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("Submitting Product:", product);
+  e.preventDefault();
+  console.log("Submitting Product:", product);
 
-    try {
-      const response = await axios.post(`${BackendUrl}/products`, product);
-      const data = await response.json();
-      console.log("Saved:", data);
-    } catch (err) {
-      console.error("Error:", err);
+  try {
+    // create FormData object
+    const formData = new FormData();
+    formData.append("name", product.name);
+    formData.append("description", product.description);
+    formData.append("color", product.color);
+    formData.append("size", product.size);
+    formData.append("cost", product.cost);
+
+    if (product.imageFile) {
+      formData.append("image", product.imageFile); // "image" should match upload.single("image") in backend
     }
-  };
+
+    // variants need to be stringified for form-data
+    formData.append("variants", JSON.stringify(product.variants));
+
+    const response = await axios.post(`${BackendUrl}/products`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    console.log("✅ Saved:", response.data);
+
+  } catch (err) {
+    console.error("❌ Error:", err.response?.data || err.message);
+  }
+};
+
 
   return (
     <div className="container mt-4">
@@ -178,6 +204,18 @@ const FormElement = () => {
                       name="imageUrl"
                       placeholder="https://example.com/image.jpg"
                       value={product.imageUrl}
+                      onChange={handleProductChange}
+                      className="form-control"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="productImage" className="form-label fw-bold">
+                      Product Image 
+                    </label>
+                    <input
+                      type="file"
+                      id="productImage"
+                      name="imageFile"
                       onChange={handleProductChange}
                       className="form-control"
                     />

@@ -18,32 +18,42 @@ exports.createProduct = async (req, res) => {
   try {
     console.log("📦 Received Product:", req.body);
 
-    // 1️⃣ Create product first
-    const { variants, ...productData } = req.body;
-    const newProduct = new Product(productData);
+    // Cloudinary uploaded image
+    const imageUrl = req.file?.path;
+
+    // Parse variants if sent as string
+    let { variants, ...productData } = req.body;
+    if (variants && typeof variants === "string") {
+      try {
+        variants = JSON.parse(variants);
+      } catch (err) {
+        variants = [];
+      }
+    }
+
+    // 1️⃣ Create product
+    const newProduct = new Product({ ...productData, imageUrl }); 
     await newProduct.save();
 
     // 2️⃣ Create variants if provided
-    if (variants && variants.length > 0) {
+    if (Array.isArray(variants) && variants.length > 0) {
       const createdVariants = await Promise.all(
         variants.map(async (variant) => {
           const newVariant = new Variant(variant);
           await newVariant.save();
-
-          // push variant ref to product
           newProduct.variant.push(newVariant._id);
           return newVariant;
         })
       );
 
-      await newProduct.save(); // save with variants
+      await newProduct.save();
     }
 
-    // 3️⃣ Populate product with variants before sending response
+    // 3️⃣ Populate before sending response
     const populatedProduct = await Product.findById(newProduct._id).populate("variant");
 
     res.status(201).json({
-      message: "✅ Product (with variants) created successfully!",
+      message: "✅ Product created successfully with image!",
       data: populatedProduct,
     });
 
@@ -55,6 +65,8 @@ exports.createProduct = async (req, res) => {
     });
   }
 };
+
+
 
 
 
