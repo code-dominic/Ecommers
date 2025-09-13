@@ -13,7 +13,7 @@ import Dashboard from "./AdminPages/Dashboard";
 import UserPage from "./AdminPages/UserPage";
 import AdminPage from "./AdminPages/AdminPage";
 import AdminOrdersPage from "./AdminPages/AdminOrdersPage";
-import Orders from './pages/Orders';
+import Orders from './pages/Orders/OrderPage.jsx';
 import AdminProductsList from "./AdminPages/AdminProductsList";
 import AdminProductPages from "./AdminPages/AdminProductPages";
 import AdminLayout from "./layouts/AdminLayout"; // ✅ new layout
@@ -21,6 +21,8 @@ import AdminCancellation from "./AdminPages/AdminCancellation";
 import ReturnPage from "./AdminPages/ReturnPage";
 import PickupPage from "./AdminPages/PickupPage";
 import Sales from "./AdminPages/Sales";
+import CartPage from "./pages/CartPage/CartPage";
+import OrderPage from "./pages/Orders/OrderPage";
 
 
 function App() {
@@ -46,8 +48,8 @@ function App() {
         
         <Route path="/login" element={<Login token={token} setToken={setToken}/>} />
         <Route path="/register" element={<Register token={token} setToken={setToken} />} />
-        <Route path="/cart" element={<Cart token={token}/>} />
-        <Route path="/orders" element={<Orders token={token}/>} />
+        <Route path="/cart" element={<CartPage token={token}/>} />
+        <Route path="/orders" element={<OrderPage token={token}/>} />
         
 
         {/* Admin Login */}

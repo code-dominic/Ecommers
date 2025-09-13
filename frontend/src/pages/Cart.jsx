@@ -68,7 +68,7 @@ const CartPage = ({ token }) => {
 
   return (
     <div className="container mt-4">
-      <h2>Your Cart</h2>
+      <h2>Your Cart MF</h2>
       {cart.length === 0 ? (
         <p>No items in cart</p>
       ) : (

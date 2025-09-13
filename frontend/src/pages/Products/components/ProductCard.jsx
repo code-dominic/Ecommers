@@ -53,6 +53,7 @@ const ProductCard = ({
         <h5 className="card-title">{product.name}</h5>
         <p className="card-text">{product.description}</p>
 
+        <div> 
         {colorVariants.length > 0 && (
           <VariantToggle label="Color" options={colorVariants} value={currColor} setValue={setCurrColor} />
         )}
@@ -60,6 +61,7 @@ const ProductCard = ({
         {sizeVariants.length > 0 && (
           <VariantToggle label="Size" options={sizeVariants} value={currSize} setValue={setCurrSize} />
         )}
+        </div>
 
         <div className="mt-3">
           <Button variant="outline-success" className="me-2">

@@ -1,68 +1,71 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import ToggleButton from "react-bootstrap/ToggleButton";
-import ToggleButtonGroup from "react-bootstrap/ToggleButtonGroup";
-import { Modal, Button, Form } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Badge,
+  Form,
+  Alert,
+  Spinner,
+  Modal,
+  ProgressBar
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import VariantToggle from "./components/VariantToggle";
 
 const BackendUrl = import.meta.env.VITE_APP_BackendUrl;
 
 const Product = ({ token, productID, setProductID }) => {
-  const [product, setProduct] = useState(null);        // full fetched product
-  const [currProduct, setCurrProduct] = useState(null); // currently selected variant or product fallback
+  const [product, setProduct] = useState(null);
+  const [currProduct, setCurrProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   const [currColor, setCurrColor] = useState("");
   const [colorVariants, setColorVariants] = useState([]);
 
   const [currSize, setCurrSize] = useState("");
-  const [sizeVariants, setSizeVariants] = useState([]); // overall sizes (used for rendering)
-  const [availableSizesForColor, setAvailableSizesForColor] = useState([]); // sizes available for selected color
+  const [sizeVariants, setSizeVariants] = useState([]);
+  const [availableSizesForColor, setAvailableSizesForColor] = useState([]);
 
-  // other UI state (reviews/update)
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(5);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [updatedName, setUpdatedName] = useState("");
-  const [updatedDescription, setUpdatedDescription] = useState("");
-  const [updatedCost, setUpdatedCost] = useState("");
-  const [updatedImageUrl, setUpdatedImageUrl] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVariant, setAlertVariant] = useState("success");
 
   const navigate = useNavigate();
 
-  // Fetch product on mount / when productID changes
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const res = await axios.get(`${BackendUrl}/products/${productID}`);
         const data = res.data;
         setProduct(data);
 
-        // If product has variants array (referenced as 'variant' in your schema)
         if (data.variant && data.variant.length > 0) {
-          // Unique colors and sizes across all variants
           const uniqueColors = [...new Set(data.variant.map((v) => v.color))];
           const uniqueSizes = [...new Set(data.variant.map((v) => v.size))];
 
           setColorVariants(uniqueColors);
           setSizeVariants(uniqueSizes);
 
-          // Default selections: pick first variant's color & size
           const defaultVariant = data.variant[0];
           setCurrColor(defaultVariant.color);
           setCurrSize(defaultVariant.size);
 
-          // set available sizes for that color and current displayed product
           const sizesForColor = [
             ...new Set(
               data.variant.filter((v) => v.color === defaultVariant.color).map((v) => v.size)
             ),
           ];
           setAvailableSizesForColor(sizesForColor);
-
           setCurrProduct(defaultVariant);
         } else {
-          // no variants -> fallback to product itself
           setCurrColor(data.color || "");
           setCurrSize(data.size || "");
           setCurrProduct(data);
@@ -72,6 +75,9 @@ const Product = ({ token, productID, setProductID }) => {
         }
       } catch (err) {
         console.error("❌ Error fetching product:", err);
+        showAlert("Failed to load product details", "danger");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -83,36 +89,29 @@ const Product = ({ token, productID, setProductID }) => {
     if (productID) fetchData();
   }, [productID, setProductID]);
 
-  // When currColor changes: update available sizes and pick a valid currSize if needed
   useEffect(() => {
     if (!product || !product.variant) return;
 
-    // Compute sizes available for the selected color
     const sizes = [
       ...new Set(product.variant.filter((v) => v.color === currColor).map((v) => v.size)),
     ];
     setAvailableSizesForColor(sizes);
 
     if (sizes.length === 0) {
-      // if no sizes for color (shouldn't normally happen), fallback to first variant
-      const fallback = product;
       setCurrSize(product.size);
-      setCurrProduct(fallback);
+      setCurrProduct(product);
     } else {
-      // If current size isn't in the available sizes, pick the first available size
       if (!sizes.includes(currSize)) {
         setCurrSize(sizes[0]);
         const matched = product.variant.find((v) => v.color === currColor && v.size === sizes[0]);
         if (matched) setCurrProduct(matched);
       } else {
-        // if currSize still valid, update currProduct for color+size
         const matched = product.variant.find((v) => v.color === currColor && v.size === currSize);
         if (matched) setCurrProduct(matched);
       }
     }
   }, [currColor, product]);
 
-  // When currSize changes: update currProduct for (color,size) pair
   useEffect(() => {
     if (!product || !product.variant) return;
     const matched = product.variant.find((v) => v.color === currColor && v.size === currSize);
@@ -120,39 +119,49 @@ const Product = ({ token, productID, setProductID }) => {
     if (matched) {
       setCurrProduct(matched);
     } else {
-      // if no exact match, try to pick a variant matching currColor only
       const byColor = product.variant.find((v) => v.color === currColor);
       if (byColor) setCurrProduct(byColor);
-      else setCurrProduct(product); // fallback to product
+      else setCurrProduct(product);
     }
   }, [currSize, currColor, product]);
 
-  // Loading guard
-  if (!currProduct) return <h4>Loading product...</h4>;
+  const showAlert = (message, variant = "success") => {
+    setAlertMessage(message);
+    setAlertVariant(variant);
+    setTimeout(() => setAlertMessage(""), 4000);
+  };
 
-  // --- Actions ---
   const handleAddToCart = async (e) => {
-  e.preventDefault();
-  try {
-    const payload = {
-      Qty: 1,
-      variantId: currProduct?._id || null
-    };
+    e.preventDefault();
+    try {
+      setAddingToCart(true);
+      const payload = {
+        Qty: 1,
+        variantId: currProduct?._id || null
+      };
 
-    await axios.post(`${BackendUrl}/cart/${productID}`, payload, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      await axios.post(`${BackendUrl}/cart/${productID}`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    alert("Added to cart!");
-  } catch (err) {
-    console.error("Error adding to cart:", err);
-    alert("Failed to add to cart.");
-  }
-};
+      showAlert("Product added to cart successfully! 🛒", "success");
+    } catch (err) {
+      console.error("Error adding to cart:", err);
+      showAlert("Failed to add product to cart", "danger");
+    } finally {
+      setAddingToCart(false);
+    }
+  };
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
+    if (!reviewText.trim()) {
+      showAlert("Please write a review before submitting", "warning");
+      return;
+    }
+
     try {
+      setSubmittingReview(true);
       await axios.post(`${BackendUrl}/products/${productID}/review`, {
         text: reviewText,
         rating,
@@ -161,174 +170,438 @@ const Product = ({ token, productID, setProductID }) => {
       setReviewText("");
       setRating(5);
 
-      // refresh product & variants
       const updated = await axios.get(`${BackendUrl}/products/${productID}`);
       setProduct(updated.data);
+
+      showAlert("Review submitted successfully! ⭐", "success");
     } catch (err) {
       console.error("Error submitting review:", err);
+      showAlert("Failed to submit review", "danger");
+    } finally {
+      setSubmittingReview(false);
     }
   };
 
-  const handleDelete = async () => {
-    try {
-      await axios.delete(`${BackendUrl}/products/${productID}`);
-      navigate("/");
-    } catch (err) {
-      console.error("Error deleting product:", err);
-    }
+  const getAverageRating = () => {
+    if (!product.reviews || product.reviews.length === 0) return 0;
+    const sum = product.reviews.reduce((acc, review) => acc + review.rating, 0);
+    return (sum / product.reviews.length).toFixed(1);
   };
 
-  // Simple update modal submit (keeps existing fields)
-  const handleUpdateSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.put(`${BackendUrl}/products/${productID}`, {
-        name: updatedName,
-        description: updatedDescription,
-        cost: updatedCost,
-        imageUrl: updatedImageUrl,
-      });
-
-      const updated = await axios.get(`${BackendUrl}/products/${productID}`);
-      setProduct(updated.data);
-      setShowUpdateModal(false);
-    } catch (err) {
-      console.error("Error updating product:", err);
-    }
+  const renderStars = (rating) => {
+    return "⭐".repeat(Math.floor(rating)) + "☆".repeat(5 - Math.floor(rating));
   };
 
-  // --- Render ---
+  if (loading) {
+    return (
+      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "400px" }}>
+        <div className="text-center">
+          <Spinner animation="border" variant="primary" />
+          <div className="mt-2">Loading product details...</div>
+        </div>
+      </Container>
+    );
+  }
+
+  if (!currProduct) {
+    return (
+      <Container className="text-center mt-5">
+        <Alert variant="warning">
+          <h4>Product not found</h4>
+          <p>The product you're looking for doesn't exist or has been removed.</p>
+          <Button variant="primary" onClick={() => navigate("/")}>
+            Go to Home
+          </Button>
+        </Alert>
+      </Container>
+    );
+  }
+
   return (
-    <>
-      <div style={{ display: "flex", justifyContent: "center", gap: "2rem", padding: "2rem" }}>
-        {/* Product Card */}
-        <div className="card" style={{ width: "36rem" }}>
-          <img 
-            style={{
-              height : '500px',
+    <div className="product-page">
+      <Container className="py-4">
+        {alertMessage && (
+          <Alert variant={alertVariant} dismissible onClose={() => setAlertMessage("")}>
+            {alertMessage}
+          </Alert>
+        )}
 
-            }}
-            src={currProduct.imageUrl || product.imageUrl}
-            className="card-img-top"
-            alt={product.name}
-          />
-          <div className="card-body">
-            <h5 className="card-title">{product.name}</h5>
-            <p className="card-text">{product.description}</p>
+        <Row className="g-4 align-items-stretch">
+          {/* Product Image and Info */}
+          < Col lg={6}>
+            <Card className="product-image-card shadow-sm h-100">
+                <Card.Img style={{height : "100%"}}
+                  src={currProduct.imageUrl || product.imageUrl}
+                  alt={product.name}
+                  className="product-image mb-3"
+                />
+            </Card>
+          </Col>
 
-            {/* Color toggles (if multiple colors) */}
-            {colorVariants.length > 0 && (
-              <div className="mb-3">
-                <VariantToggle label={'color'} options={colorVariants}  value ={currColor} setValue={setCurrColor}  />
-              </div>
-            )}
+          {/* Product Details */}
+          <Col lg={6}>
+            <Card className="product-details-card shadow-sm h-100">
+              <Card.Body className="p-4">
+                <div className="product-header mb-4">
+                  <Badge bg="primary" className="mb-2">New Arrival</Badge>
+                  <h1 className="product-title">{product.name}</h1>
 
-            {/* Size toggles: only sizes available for currently selected color are enabled */}
-            {sizeVariants.length > 0 && (
-              <div className="mb-3">
-                
+                  {/* Rating Display */}
+                  <div className="rating-section mb-3">
+                    <div className="rating-stars">
+                      {renderStars(getAverageRating())}
+                      <span className="rating-number ms-2">({getAverageRating()})</span>
+                    </div>
+                    <div className="review-count text-muted">
+                      {product.reviews?.length || 0} Reviews
+                    </div>
+                  </div>
 
-                <VariantToggle label={'Size'} options={sizeVariants}  value ={currSize} setValue={setCurrSize}  />  
-              </div>
-            )}
-
-            <div className="mb-3">
-              <Button variant="outline-success" className="me-2">
-                Cost: ₹{currProduct.cost ?? product.cost}
-              </Button>
-              <Button variant="outline-warning" className="me-2" onClick={handleAddToCart}>
-                Add to Cart
-              </Button>
-              {/* <Button variant="outline-danger" className="me-2" onClick={handleDelete}>
-                Delete
-              </Button>
-              <Button variant="outline-primary" onClick={() => {
-                // open modal and prefill
-                setUpdatedName(product.name);
-                setUpdatedDescription(product.description);
-                setUpdatedCost(product.cost);
-                setUpdatedImageUrl(product.imageUrl);
-                setShowUpdateModal(true);
-              }}>
-                Update
-              </Button> */}
-            </div>
-          </div>
-        </div>
-
-        {/* Review Section */}
-        <div className="card" style={{ width: "36rem", padding: "1rem" }}>
-          <form onSubmit={handleSubmitReview}>
-            <div className="mb-3">
-              <label className="form-label">Enter Your Review</label>
-              <textarea
-                className="form-control"
-                rows="3"
-                value={reviewText}
-                onChange={(e) => setReviewText(e.target.value)}
-              />
-            </div>
-
-            <label className="form-label">Rating: {rating}</label>
-            <input
-              type="range"
-              className="form-range"
-              min="0"
-              max="5"
-              value={rating}
-              onChange={(e) => setRating(parseInt(e.target.value))}
-            />
-            <Button type="submit" className="mt-2">Submit</Button>
-          </form>
-
-          <hr />
-          <h5>Reviews</h5>
-          {Array.isArray(product.reviews) && product.reviews.length === 0 && <p>No reviews yet.</p>}
-          {Array.isArray(product.reviews) &&
-            product.reviews.map((r) => (
-              <div className="card mb-3" style={{ width: "100%" }} key={r._id}>
-                <div className="card-body">
-                  <h6 className="card-subtitle mb-2 text-muted">
-                    {`Rating: ${"⭐".repeat(r.rating)}${"☆".repeat(5 - r.rating)}`}
-                  </h6>
-                  <p className="card-text">{r.text}</p>
+                  <div className="price-section mb-4">
+                    <h2 className="current-price">₹{currProduct.cost ?? product.cost}</h2>
+                  </div>
                 </div>
-              </div>
-            ))}
-        </div>
-      </div>
 
-      {/* Update Modal
-      <Modal show={showUpdateModal} onHide={() => setShowUpdateModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Update Product</Modal.Title>
-        </Modal.Header>
-        <Form onSubmit={handleUpdateSubmit}>
-          <Modal.Body>
-            <Form.Group className="mb-3">
-              <Form.Label>Name</Form.Label>
-              <Form.Control type="text" value={updatedName} onChange={(e) => setUpdatedName(e.target.value)} />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Description</Form.Label>
-              <Form.Control as="textarea" rows={3} value={updatedDescription} onChange={(e) => setUpdatedDescription(e.target.value)} />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Cost</Form.Label>
-              <Form.Control type="number" value={updatedCost} onChange={(e) => setUpdatedCost(e.target.value)} />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Photo Link</Form.Label>
-              <Form.Control type="text" value={updatedImageUrl} onChange={(e) => setUpdatedImageUrl(e.target.value)} />
-            </Form.Group>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowUpdateModal(false)}>Close</Button>
-            <Button variant="primary" type="submit">Save Changes</Button>
-          </Modal.Footer>
-        </Form>
-      </Modal> */}
-    </>
+                <div className="product-description mb-4">
+                  <h5>Description</h5>
+                  <p className="text-muted">{product.description}</p>
+                </div>
+
+                {/* Variant Selection */}
+                <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+  {colorVariants.length > 0 && (
+    <VariantToggle
+      label="Color"
+      options={colorVariants}
+      value={currColor}
+      setValue={setCurrColor}
+    />
+  )}
+
+  {sizeVariants.length > 0 && (
+    <VariantToggle
+      label="Size"
+      options={sizeVariants}
+      value={currSize}
+      setValue={setCurrSize}
+    />
+  )}
+</div>
+                {/* Action Buttons */}
+                <div className="action-buttons">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    className="add-to-cart-btn me-3"
+                    onClick={handleAddToCart}
+                    disabled={addingToCart}
+                  >
+                    {addingToCart ? (
+                      <>
+                        <Spinner size="sm" className="me-2" />
+                        Adding...
+                      </>
+                    ) : (
+                      "🛒 Add to Cart"
+                    )}
+                  </Button>
+
+                  <Button variant="outline-secondary" size="lg">
+                    ❤️ Wishlist
+                  </Button>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Reviews Section */}
+        <Row className="mt-5">
+          <Col>
+            <Card className="reviews-section shadow-sm">
+              <Card.Header className="bg-light">
+                <h3 className="mb-0">Customer Reviews</h3>
+              </Card.Header>
+              <Card.Body>
+                <Row>
+                  {/* Write Review */}
+                  <Col md={5}>
+                    <div className="write-review-section">
+                      <h5 className="mb-3">Write a Review</h5>
+                      <Form onSubmit={handleSubmitReview}>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Your Review</Form.Label>
+                          <Form.Control
+                            as="textarea"
+                            rows={4}
+                            placeholder="Share your thoughts about this product..."
+                            value={reviewText}
+                            onChange={(e) => setReviewText(e.target.value)}
+                            className="review-textarea"
+                          />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                          <Form.Label>Rating: {rating} ⭐</Form.Label>
+                          <Form.Range
+                            min={1}
+                            max={5}
+                            value={rating}
+                            onChange={(e) => setRating(parseInt(e.target.value))}
+                            className="rating-slider"
+                          />
+                          <div className="rating-labels d-flex justify-content-between small text-muted">
+                            <span>Poor</span>
+                            <span>Excellent</span>
+                          </div>
+                        </Form.Group>
+
+                        <Button
+                          type="submit"
+                          variant="primary"
+                          disabled={submittingReview || !reviewText.trim()}
+                          className="submit-review-btn"
+                        >
+                          {submittingReview ? (
+                            <>
+                              <Spinner size="sm" className="me-2" />
+                              Submitting...
+                            </>
+                          ) : (
+                            "Submit Review"
+                          )}
+                        </Button>
+                      </Form>
+                    </div>
+                  </Col>
+
+                  {/* Reviews List */}
+                  <Col md={7}>
+                    <div className="reviews-list">
+                      <h5 className="mb-3">
+                        All Reviews ({product.reviews?.length || 0})
+                      </h5>
+
+                      {(!product.reviews || product.reviews.length === 0) ? (
+                        <div className="no-reviews text-center py-4">
+                          <div className="mb-3">📝</div>
+                          <h6>No reviews yet</h6>
+                          <p className="text-muted">Be the first to share your thoughts about this product!</p>
+                        </div>
+                      ) : (
+                        <div className="reviews-container">
+                          {product.reviews.map((review) => (
+                            <Card key={review._id} className="review-card mb-3">
+                              <Card.Body>
+                                <div className="review-header d-flex justify-content-between align-items-start mb-2">
+                                  <div className="review-rating">
+                                    {renderStars(review.rating)}
+                                  </div>
+                                  <small className="text-muted">
+                                    {new Date(review.createdAt || Date.now()).toLocaleDateString()}
+                                  </small>
+                                </div>
+                                <p className="review-text mb-0">{review.text}</p>
+                              </Card.Body>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+
+      <style jsx>{`
+        .product-page {
+          background-color: #f8f9fa;
+          min-height: 100vh;
+        }
+
+        .product-image-card {
+          border-radius: 15px;
+          overflow: hidden;
+          border: none;
+        }
+
+        .image-container {
+          position: relative;
+          height: 500px;
+          overflow: hidden;
+        }
+
+        .product-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
+
+        .product-image:hover {
+          transform: scale(1.05);
+        }
+
+        .product-details-card {
+          border-radius: 15px;
+          border: none;
+        }
+
+        .product-title {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #212529;
+          margin-bottom: 0;
+        }
+
+        .rating-section {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+        }
+
+        .rating-stars {
+          font-size: 1.2rem;
+        }
+
+        .rating-number {
+          font-weight: 600;
+          color: #495057;
+        }
+
+        .review-count {
+          font-size: 0.9rem;
+        }
+
+        .current-price {
+          font-size: 2.2rem;
+          font-weight: 700;
+          color: #28a745;
+          margin: 0;
+        }
+
+        .product-description p {
+          font-size: 1.1rem;
+          line-height: 1.6;
+        }
+
+        .variant-section {
+          padding: 15px 0;
+          border-bottom: 1px solid #e9ecef;
+        }
+
+        .variant-section:last-child {
+          border-bottom: none;
+        }
+
+        .action-buttons {
+          padding-top: 20px;
+          border-top: 2px solid #e9ecef;
+        }
+
+        .add-to-cart-btn {
+          font-weight: 600;
+          padding: 12px 30px;
+          font-size: 1.1rem;
+          border-radius: 10px;
+          transition: all 0.3s ease;
+        }
+
+        .add-to-cart-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(0,123,255,0.3);
+        }
+
+        .reviews-section {
+          border-radius: 15px;
+          border: none;
+        }
+
+        .write-review-section {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 25px;
+          border-radius: 15px;
+          height: fit-content;
+        }
+
+        .write-review-section h5 {
+          color: white;
+        }
+
+        .review-textarea {
+          border-radius: 10px;
+          border: none;
+          resize: none;
+        }
+
+        .rating-slider {
+          margin: 10px 0;
+        }
+
+        .submit-review-btn {
+          background: rgba(255,255,255,0.2);
+          border: 2px solid rgba(255,255,255,0.3);
+          border-radius: 10px;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        }
+
+        .submit-review-btn:hover {
+          background: rgba(255,255,255,0.3);
+          transform: translateY(-1px);
+        }
+
+        .reviews-container {
+          max-height: 400px;
+          overflow-y: auto;
+        }
+
+        .review-card {
+          border: none;
+          background: #f8f9fa;
+          border-radius: 10px;
+          transition: transform 0.2s ease;
+        }
+
+        .review-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .no-reviews {
+          color: #6c757d;
+        }
+
+        .no-reviews div:first-child {
+          font-size: 3rem;
+        }
+
+        @media (max-width: 768px) {
+          .product-title {
+            font-size: 2rem;
+          }
+
+          .current-price {
+            font-size: 1.8rem;
+          }
+
+          .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          }
+
+          .add-to-cart-btn,
+          .add-to-cart-btn + button {
+            width: 100%;
+          }
+        }
+      `}</style>
+    </div>
   );
 };
 

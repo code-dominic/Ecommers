@@ -20,7 +20,7 @@ const Navbar = ({ token, setToken }) => {
     <nav
       className="navbar navbar-expand-lg shadow-sm"
       style={{
-        background: "linear-gradient(90deg, #2d9382, #1c5d53)",
+        background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
         padding: "0.8rem 1.5rem",
       }}
     >

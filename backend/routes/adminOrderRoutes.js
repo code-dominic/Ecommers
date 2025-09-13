@@ -50,6 +50,38 @@ router.get("/cancel", auth , async(req, res)=>{
   }
 })
 
+router.put("/:id" , auth , async(req , res)=>{
+  try{
+    const {id} = req.params;
+    const {status} = req.body;
+
+    const normalizedStatus = status?.toLowerCase();
+
+    const validStatuses = ["pending", "processing", "shipped", "delivered", "cancelled"];
+
+    if (!validStatuses.includes(normalizedStatus)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      id,
+      { status : normalizedStatus },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.status(200).json({message : 'Sucessfully Updated the product'});
+
+
+  }catch(error){
+     console.error("Error updating order:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+})
+
 
 
 module.exports = router;
