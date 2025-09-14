@@ -1,4 +1,10 @@
-# backend/node_modules/
-# frontend/node_modules/
-# backend/.env
-# frontend/.env
+backend/node_modules/
+frontend/node_modules/
+backend/ .env
+frontend/ .env
+
+# Node modules (anywhere)
+node_modules/
+
+# Env files (anywhere)
+.env
