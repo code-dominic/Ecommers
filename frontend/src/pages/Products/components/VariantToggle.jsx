@@ -289,7 +289,9 @@ function VariantToggle({ label, options, value, setValue }) {
             min-height: 32px;
           }
             
-          /* Dark mode support */
+         
+        }
+           /* Dark mode support */
         @media (prefers-color-scheme: dark) {
           .variant-toggle-container {
             background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
@@ -313,7 +315,6 @@ function VariantToggle({ label, options, value, setValue }) {
             color: #90cdf4;
             background: rgba(144, 205, 244, 0.2);
           }
-        }
       `}</style>
     </div>
   );

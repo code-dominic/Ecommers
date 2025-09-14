@@ -10,6 +10,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 // const adminOrderRoute = require('./routes/adminOrderRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const returnRoutes = require('./routes/returnRoutes')
 
 
 const app = express();
@@ -25,6 +26,7 @@ app.use("/orders" , orderRoutes);
 app.use("/users", userRoutes);
 app.use("/cart", cartRoutes);
 app.use("/dashboard" , dashboardRoutes);
+app.use("/returns" , returnRoutes);
 
 app.get("/" , (req , res) =>{
     res.send("HI the backend is working!!!");

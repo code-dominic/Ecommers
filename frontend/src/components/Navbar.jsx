@@ -46,7 +46,7 @@ const Navbar = ({ token, setToken }) => {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+        <div  className="collapse navbar-collapse navDiv" id="navbarSupportedContent">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0 gap-2">
             <li className="nav-item">
               <Link className="nav-link text-white fw-medium" to="/">

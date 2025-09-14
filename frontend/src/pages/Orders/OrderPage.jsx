@@ -39,6 +39,20 @@ const OrderPage = ({ token }) => {
     }
   };
 
+  const returnOrder = async (orderId, reason) => {
+    try {
+      await axios.post(
+        `${BackendUrl}/returns/${orderId}`,
+        { reason },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Return request submitted successfully ✅");
+    } catch (err) {
+      console.error("Error submitting return:", err);
+      alert("Failed to submit return ❌");
+    }
+  };
+
   return (
     <>
       <style>
@@ -106,6 +120,7 @@ const OrderPage = ({ token }) => {
                 key={order._id}
                 order={order}
                 cancelOrder={cancelOrder}
+                returnOrder = {returnOrder}
               />
             ))}
           </>

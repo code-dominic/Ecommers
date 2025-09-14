@@ -1,11 +1,26 @@
-import { Button } from "react-bootstrap";
+import { useState } from "react";
+import { Button, Modal, Form } from "react-bootstrap";
 import OrderTimeline from "./OrderTimeline";
+import ReturnTimeline from "./ReturnTimeline";
 
-const OrderRow = ({ order, cancelOrder }) => {
+const OrderRow = ({ order, cancelOrder, returnOrder }) => {
   const price = order.variant ? order.variant.cost : order.product.cost;
   const total = price * order.quantity;
   const imageUrl = order.variant?.imageUrl || order.product.imageUrl;
   const name = order.product.name;
+
+  const [showModal, setShowModal] = useState(false);
+  const [returnReason, setReturnReason] = useState("");
+
+  const handleReturnSubmit = () => {
+    if (!returnReason.trim()) {
+      alert("Please provide a reason for return.");
+      return;
+    }
+    returnOrder(order._id, returnReason);
+    setReturnReason("");
+    setShowModal(false);
+  };
 
   return (
     <div className="d-flex flex-column border-bottom py-3 order-row">
@@ -27,15 +42,6 @@ const OrderRow = ({ order, cancelOrder }) => {
           />
           <div>
             <div className="font-weight-bold">{name}</div>
-            {/* <div className="text-muted small">
-              {order.variant ? (
-                <>
-                  Color: {order.variant.color}, Size: {order.variant.size}
-                </>
-              ) : (
-                "No variant"
-              )}
-            </div> */}
           </div>
         </div>
 
@@ -46,14 +52,23 @@ const OrderRow = ({ order, cancelOrder }) => {
         <div style={{ flex: 1, textAlign: "center" }}>{order.quantity}</div>
 
         {/* Total */}
-        <div style={{ flex: 1, textAlign: "right" }}>
-          ₹{total}
-        </div>
+        <div style={{ flex: 1, textAlign: "right" }}>₹{total}</div>
       </div>
 
-      {/* Timeline + Cancel Button */}
+      {/* Timeline + Actions */}
       <div className="mt-3 d-flex justify-content-between align-items-center">
-        <OrderTimeline status={order.status} createdAt={order.createdAt} />
+        {/* Show Return Timeline if returned, otherwise Order Timeline */}
+        {order.return?.isReturned ? (
+          <ReturnTimeline returnInfo={order.return} />
+        ) : (
+          <OrderTimeline
+            status={order.status}
+            createdAt={order.createdAt}
+            returnInfo={order.return}
+          />
+        )}
+
+        {/* Cancel Button (only if not canceled or delivered) */}
         {order.status.toLowerCase() !== "canceled" &&
           order.status.toLowerCase() !== "delivered" && (
             <Button
@@ -64,6 +79,52 @@ const OrderRow = ({ order, cancelOrder }) => {
               Cancel Order
             </Button>
           )}
+
+        {/* Return Button (only if delivered) */}
+        {order.status.toLowerCase() === "delivered" && !order.return?.isReturned && (
+          <>
+            <Button
+              variant="outline-danger"
+              size="sm"
+              onClick={() => setShowModal(true)}
+            >
+              Return
+            </Button>
+
+            <Modal
+              show={showModal}
+              onHide={() => setShowModal(false)}
+              centered
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Return Order</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Form.Group>
+                  <Form.Label>Reason for return</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    placeholder="Enter reason..."
+                    value={returnReason}
+                    onChange={(e) => setReturnReason(e.target.value)}
+                  />
+                </Form.Group>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button variant="danger" onClick={handleReturnSubmit}>
+                  Submit Return
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          </>
+        )}
       </div>
     </div>
   );

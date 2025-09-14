@@ -7,18 +7,18 @@ import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
 import UseToken from "./app/UseToken";
 import Register from "./pages/Register";
-import Cart from "./pages/Cart";
+// import Cart from "./pages/Cart";
 import AdminLogin from "./AdminPages/AdminLogin";
 import Dashboard from "./AdminPages/Dashboard";
 import UserPage from "./AdminPages/UserPage";
 import AdminPage from "./AdminPages/AdminPage";
 import AdminOrdersPage from "./AdminPages/AdminOrdersPage";
-import Orders from './pages/Orders/OrderPage.jsx';
+// import Orders from './pages/Orders/OrderPage.jsx';
 import AdminProductsList from "./AdminPages/AdminProductsList";
 import AdminProductPages from "./AdminPages/AdminProductPages";
 import AdminLayout from "./layouts/AdminLayout"; // ✅ new layout
 import AdminCancellation from "./AdminPages/AdminCancellation";
-import ReturnPage from "./AdminPages/ReturnPage";
+import AdminReturnPage from "./AdminPages/AdminReturnPage";
 import PickupPage from "./AdminPages/PickupPage";
 import Sales from "./AdminPages/Sales";
 import CartPage from "./pages/CartPage/CartPage";
@@ -67,7 +67,7 @@ function App() {
           <Route path="addproducts" element={<FormElement token={token}  />} />
           <Route path="products/add" element={<FormElement token={token}  />} />
           <Route path="products/add" element={<FormElement token={token}  />} />
-          <Route path="returns" element={<ReturnPage/>}/>
+          <Route path="returns" element={<AdminReturnPage token={token}/>}/>
           <Route path="pickups" element={<PickupPage/>}/>
           <Route path="sales" element={<Sales/>}/>
         </Route>

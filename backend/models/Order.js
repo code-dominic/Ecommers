@@ -34,6 +34,19 @@ const orderSchema = new Schema({
     type: Number,
     required: true,
   },
+
+  // ✅ nested return info
+  return: {
+    isReturned: { type: Boolean, default: false },
+    reason: { type: String },
+    status: {
+      type: String,
+      enum: ['requested', 'approved', 'rejected' , 'pickedUp', 'completed'],
+    },
+    requestedAt: { type: Date },
+    processedAt: { type: Date }
+  }
+
 }, { timestamps: true });
 
 const Order = mongoose.model('Order', orderSchema);

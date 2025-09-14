@@ -599,7 +599,64 @@ const Product = ({ token, productID, setProductID }) => {
           .add-to-cart-btn + button {
             width: 100%;
           }
+
+
         }
+
+         @media (max-width: 576px){
+         /* Reduce font sizes */
+        .product-title {
+            font-size: 1.5rem;
+          }
+
+          .current-price {
+            font-size: 1.2rem;
+          }
+
+          .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          }
+
+      h2 {
+        font-size: 1.2rem !important;
+      }
+      h4 {
+        font-size: 1rem !important;
+      }
+      h5 {
+        font-size: 0.9rem !important;
+      }
+      strong {
+        font-size: 0.9rem !important;
+      }
+      span, div, label {
+        font-size: 0.6rem;
+      }
+      
+
+      /* Shrink buttons */
+      .btn {
+        font-size: 0.75rem !important;
+        padding: 0.25rem 0.5rem !important;
+      }
+
+      /* Shrink checkout button */
+      .btn-lg {
+        font-size: 0.85rem !important;
+        padding: 0.4rem 0.8rem !important;
+      }
+
+      /* Shrink textarea */
+      textarea {
+        font-size: 0.8rem !important;
+      }
+        .navDiv { 
+        font-size: 12.8px !important;
+      }
+
+         }
       `}</style>
     </div>
   );
